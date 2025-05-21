@@ -44,6 +44,8 @@ The following toString() method has been overridden and is printing the output w
 
 ![Login_page](https://github.com/K8avid/CTF_Java-_Custom_gadget_deserialisation/blob/main/toString.png) 
 
+At this point we can sense that, if we provide an ingeniousely crafted CSRF token, we will most likely be able to execute remote code, so let's try to serialize ourself a DebugHandler type object with the right fields !
+
 ## 2. Creating the right payload
 
 
@@ -53,8 +55,7 @@ The following toString() method has been overridden and is printing the output w
 
 
 --------------
-At this point we can sense that, if we provide an ingeniousely crafted CSRF token, we will most likely be able to execute remote code, so let's try to serialize ourself an object,
-for exemple a String that will be the result of a shell call ! 
+
 
 
 
