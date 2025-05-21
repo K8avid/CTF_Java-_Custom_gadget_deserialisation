@@ -1,5 +1,8 @@
-# Root-me CTF challenge : Java - Custom gadget deserialisation
+# Root-me CTF challenge : Java - Custom gadget deserialization
 
+## 1. What is Serialization and Deserialization
+
+## 2. Gathering information and understanding the code
 
 Starting the challenge, we are welcomed by the following login page  
 
@@ -16,7 +19,7 @@ And it does look like it is being encoded in base64, we can try to decode it and
 It seems like we are chaining methodes from an initial class called UUID, there does not seem to be more let's dive into the provided source code ! 
 
 Directed by our find, lets check the methods that are handling the /login route.   
-First of all, we can see that in the HomeIndex class, located in srs/main/,  
+First of all, we can see that in the HomeIndex class, located in srs/main/java/com/rootme/serial,  
 
 ![Login_page](https://github.com/K8avid/CTF_Java-_Custom_gadget_deserialisation/blob/main/get_login.png)  
 GET to the /login route creates a CSRF token and adds it to the model  
@@ -25,10 +28,31 @@ GET to the /login route creates a CSRF token and adds it to the model
 ![Login_page](https://github.com/K8avid/CTF_Java-_Custom_gadget_deserialisation/blob/main/post_login.png)  
 
 the POST method to the /login route takes a CSRF token as a parameter and then deserializes it by calling deserialize() from the SerializationUtils class
-After decoding it from base64 the deserialize() method itself calls readObject(), which will read and recreate the object, 
+After decoding it from base64 the deserialize() method itself calls readObject(), which will read and recreate the object,
+
 
 ![Login_page](https://github.com/K8avid/CTF_Java-_Custom_gadget_deserialisation/blob/main/deserialize.png)  
 
+The base64 decoder has nothing in particular, if we take a closer look at readObjet(), it calls a run() method that requires a boolean debug field of the class DebugHelper it is in, to be true.
+The readObject() method belongs to a DebugerHelper class in the same folder, which means that the csrf token we will pass should be an object of that class
+Here in the beginning of the run method :  
+
+![Login_page](https://github.com/K8avid/CTF_Java-_Custom_gadget_deserialisation/blob/main/run.png)  
+
+If we can set the debug field to true, by reading the function we can see that it will start by decoding a base64 encoded command, then execute it and store the result in the output field
+The following toString() method has been overridden and is printing the output when calling the print method on a DebugHelper object
+
+![Login_page](https://github.com/K8avid/CTF_Java-_Custom_gadget_deserialisation/blob/main/toString.png) 
+
+## 2. Creating the right payload
+
+
+
+
+
+
+
+--------------
 At this point we can sense that, if we provide an ingeniousely crafted CSRF token, we will most likely be able to execute remote code, so let's try to serialize ourself an object,
 for exemple a String that will be the result of a shell call ! 
 
